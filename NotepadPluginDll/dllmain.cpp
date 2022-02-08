@@ -7,33 +7,76 @@
 InjectLibrary::Injector injector("UniqMutexName", WH_CALLWNDPROC);
 InjectLibrary::DllTrampolineInstaller installer;
 HWND hMainWnd = nullptr;
-const UINT_PTR MENU_ID = 999;
+HWND hEdit = nullptr;
+HMENU hSubmenu = nullptr;
+const UINT_PTR START_MENU_ID = 999;
 
 typedef HWND(__stdcall* CreateWindowExType)(DWORD, LPCWSTR, LPCWSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID);
 CreateWindowExType createWindowExTrampoline = nullptr;
 typedef LRESULT(__stdcall* DispatchMessageType)(const MSG* lpMsg);
 DispatchMessageType dispatchMessageTrampoline = nullptr;
 
+void AddMenuItems(HWND hWnd)
+{
+    hSubmenu = CreateMenu();
+    HMENU hMenu = GetMenu(hMainWnd);
+
+    AppendMenuA(hMenu, MF_POPUP, UINT_PTR(hSubmenu), "Дополнительно");
+    AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID, "ВЕРХНИЙ РЕГИСТР");
+    AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID + 1, "нижний регистр");
+    AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID + 2, "иНВЕРТИРОВАТЬ РЕГИСТР");
+}
+
 HWND __stdcall CreateWindowExHookPayload(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {
-    HWND hwnd = (*createWindowExTrampoline)(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    HWND hWnd = (*createWindowExTrampoline)(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
     const std::wstring className = std::wstring(lpClassName);
     if (!hMainWnd && className == L"Notepad") {
-        hMainWnd = hwnd;
-        HMENU hMenu = GetMenu(hMainWnd);
-
-        AppendMenuA(hMenu, MF_STRING, MENU_ID, "О перехвате API");
+        hMainWnd = hWnd;
+        AddMenuItems(hMainWnd);
     }
-    return hwnd;
+    if (!hEdit && className == L"Edit") {
+        hEdit = hWnd;
+    }
+    return hWnd;
 }
 
 LRESULT __stdcall DispatchMessageHookPayload(const MSG* lpMsg)
 {
     if (hMainWnd && hMainWnd == lpMsg->hwnd) {
-        if (lpMsg->message == WM_COMMAND) {
-            if (LOWORD(lpMsg->wParam) == MENU_ID) {
-                MessageBoxExA(hMainWnd, "Это диалоговое окно было вызвано из пункта меню, добавленного на лету", "Диалог из внедренного кода", MB_OK, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
+        switch (lpMsg->message) {
+        case WM_CREATE:
+            AddMenuItems(lpMsg->hwnd);
+            break;
+        case WM_COMMAND:
+            WORD menuId = LOWORD(lpMsg->wParam);
+            if (menuId >= START_MENU_ID && menuId < START_MENU_ID + 3) {
+                DWORD selStart = 0;
+                DWORD selEnd = 0;
+                SendMessageA(hEdit, EM_GETSEL, WPARAM(&selStart), LPARAM(&selEnd));
+                if (selStart < selEnd) {
+                    const DWORD len = selEnd + 1; // zero-terminated
+                    WCHAR* buf = new WCHAR[len];
+                    SendMessageW(hEdit, WM_GETTEXT, (WPARAM)len, (LPARAM)buf);
+                    std::wstring text(buf);
+                    delete[] buf;
+
+                    switch (menuId) {
+                    case START_MENU_ID:
+                        std::transform(text.begin(), text.end(), text.begin(), ::towupper);
+                        break;
+                    case START_MENU_ID + 1:
+                        std::transform(text.begin(), text.end(), text.begin(), ::towlower);
+                        break;
+                    case START_MENU_ID + 2:
+                        std::transform(text.begin(), text.end(), text.begin(), [](wchar_t c) { return ::iswlower(c) ? ::towupper(c) : ::towlower(c) ; });
+                        break;
+                    }
+
+                    SendMessageW(hEdit, EM_REPLACESEL, WPARAM(1), LPARAM(text.c_str()));
+                }
             }
+            break;
         }
     }
     return(*dispatchMessageTrampoline)(lpMsg);
@@ -51,6 +94,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     case DLL_PROCESS_ATTACH:
         injector.SetHook(hModule);
         if (processName == "notepad.exe") {
+            setlocale(LC_ALL, "");
+
             InjectLibrary::StopProcess(processId);
             try {
                 (FARPROC&)createWindowExTrampoline = installer.InstallTrampoline("user32.dll", "CreateWindowExW", CreateWindowExHookPayload);
@@ -75,7 +120,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
             }
             if (hMainWnd) {
                 HMENU hMenu = GetMenu(hMainWnd);
-                DeleteMenu(hMenu, MENU_ID, MF_BYCOMMAND);
+                DeleteMenu(hMenu, UINT_PTR(hSubmenu), MF_BYCOMMAND);
                 DrawMenuBar(hMainWnd);
             }
             InjectLibrary::StartProcess(processId);

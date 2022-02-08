@@ -5,3 +5,5 @@
 #include <windows.h>
 #include <string>
 #include <stdexcept>
+#include <algorithm>
+#include <locale>
