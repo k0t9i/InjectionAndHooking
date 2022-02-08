@@ -55,7 +55,7 @@ LRESULT __stdcall DispatchMessageHookPayload(const MSG* lpMsg)
                     const DWORD len = selEnd + 1; // zero-terminated
                     WCHAR* buf = new WCHAR[len];
                     SendMessageW(hEdit, WM_GETTEXT, (WPARAM)len, (LPARAM)buf);
-                    std::wstring text(buf);
+                    std::wstring text = std::wstring(buf).substr(selStart, len);
                     delete[] buf;
 
                     switch (menuId) {
