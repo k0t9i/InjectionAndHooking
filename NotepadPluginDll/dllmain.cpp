@@ -45,9 +45,6 @@ LRESULT __stdcall DispatchMessageHookPayload(const MSG* lpMsg)
 {
     if (hMainWnd && hMainWnd == lpMsg->hwnd) {
         switch (lpMsg->message) {
-        case WM_CREATE:
-            AddMenuItems(lpMsg->hwnd);
-            break;
         case WM_COMMAND:
             WORD menuId = LOWORD(lpMsg->wParam);
             if (menuId >= START_MENU_ID && menuId < START_MENU_ID + 3) {
