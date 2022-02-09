@@ -3,8 +3,8 @@
 
 namespace InjectLibrary
 {
-	DllTrampolineInstaller::DllTrampolineInstaller(const LengthDisassemblerInterface* lengthDisassembler)
-		: _lengthDisassembler(lengthDisassembler)
+	DllTrampolineInstaller::DllTrampolineInstaller(const LengthDisassemblerInterface* lengthDisassembler, const BYTE minSpliceLength)
+		: _lengthDisassembler(lengthDisassembler), _minSpliceLength(minSpliceLength)
 	{
 	}
 
@@ -20,7 +20,7 @@ namespace InjectLibrary
 	{
 		void* addr = GetHookedFunctionAddress(dllName, functionName);
 
-		BYTE oldCodeSize = _lengthDisassembler->GetLength(addr, SIZE_OF_JUMP);
+		BYTE oldCodeSize = _lengthDisassembler->GetLength(addr, _minSpliceLength);
 
 		const std::string key = GetKey(dllName, functionName);
 		if (IsTrampolineExist(key)) {

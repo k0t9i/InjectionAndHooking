@@ -7,7 +7,7 @@
 
 InjectLibrary::LengthDisassembler lengthDisassembler;
 InjectLibrary::Injector injector("UniqMutexName", WH_CALLWNDPROC);
-InjectLibrary::DllTrampolineInstaller installer(&lengthDisassembler);
+InjectLibrary::DllTrampolineInstaller installer(&lengthDisassembler, InjectLibrary::SIZE_OF_JUMP);
 HWND hMainWnd = nullptr;
 HWND hEdit = nullptr;
 HMENU hSubmenu = nullptr;

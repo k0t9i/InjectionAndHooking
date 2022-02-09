@@ -8,7 +8,7 @@ namespace InjectLibrary
 	class DllTrampolineInstaller
 	{
 	public:
-		DllTrampolineInstaller(const LengthDisassemblerInterface* lengthDisassembler);
+		DllTrampolineInstaller(const LengthDisassemblerInterface* lengthDisassembler, const BYTE minSpliceLength);
 		virtual ~DllTrampolineInstaller();
 		const FARPROC InstallTrampoline(const std::string dllName, const std::string functionName, void* hookPayloadFunctionAddress);
 		void UninstallTrampoline(const std::string dllName, const std::string functionName);
@@ -21,5 +21,6 @@ namespace InjectLibrary
 	private:
 		std::map<const std::string, Trampoline*> _trampolines;
 		const LengthDisassemblerInterface* _lengthDisassembler = nullptr;
+		const BYTE _minSpliceLength = 0;
 	};
 };
