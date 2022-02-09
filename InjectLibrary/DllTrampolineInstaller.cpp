@@ -3,6 +3,11 @@
 
 namespace InjectLibrary
 {
+	DllTrampolineInstaller::DllTrampolineInstaller(const LengthDisassemblerInterface* lengthDisassembler)
+		: _lengthDisassembler(lengthDisassembler)
+	{
+	}
+
 	DllTrampolineInstaller::~DllTrampolineInstaller()
 	{
 		for (const auto& val : _trampolines) {
@@ -11,9 +16,12 @@ namespace InjectLibrary
 		}
 	}
 
-	const FARPROC DllTrampolineInstaller::InstallTrampoline(const std::string dllName, const std::string functionName, void* hookPayloadFunctionAddress, const BYTE oldCodeSize)
+	const FARPROC DllTrampolineInstaller::InstallTrampoline(const std::string dllName, const std::string functionName, void* hookPayloadFunctionAddress)
 	{
 		void* addr = GetHookedFunctionAddress(dllName, functionName);
+
+		BYTE oldCodeSize = _lengthDisassembler->GetLength(addr, SIZE_OF_JUMP);
+
 		const std::string key = GetKey(dllName, functionName);
 		if (IsTrampolineExist(key)) {
 			throw std::runtime_error((key + " trampoline already installed").c_str());

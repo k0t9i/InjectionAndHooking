@@ -154,6 +154,8 @@
     <ClInclude Include="DllTrampolineInstaller.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Injector.h" />
+    <ClInclude Include="LengthDisassembler.h" />
+    <ClInclude Include="Nomade040_ldisasm.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ProcessManipulation.h" />
     <ClInclude Include="Trampoline.h" />
@@ -161,6 +163,7 @@
   <ItemGroup>
     <ClCompile Include="DllTrampolineInstaller.cpp" />
     <ClCompile Include="Injector.cpp" />
+    <ClCompile Include="LengthDisassembler.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -33,6 +33,12 @@
     <ClInclude Include="ProcessManipulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LengthDisassembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Nomade040_ldisasm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -48,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ProcessManipulation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LengthDisassembler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

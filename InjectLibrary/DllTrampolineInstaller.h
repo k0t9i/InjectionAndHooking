@@ -1,15 +1,16 @@
 #pragma once
 #include "pch.h"
 #include "Trampoline.h"
+#include "LengthDisassembler.h"
 
 namespace InjectLibrary
 {
 	class DllTrampolineInstaller
 	{
 	public:
-		DllTrampolineInstaller() = default;
+		DllTrampolineInstaller(const LengthDisassemblerInterface* lengthDisassembler);
 		virtual ~DllTrampolineInstaller();
-		const FARPROC InstallTrampoline(const std::string dllName, const std::string functionName, void* hookPayloadFunctionAddress, const BYTE oldCodeSize = 0);
+		const FARPROC InstallTrampoline(const std::string dllName, const std::string functionName, void* hookPayloadFunctionAddress);
 		void UninstallTrampoline(const std::string dllName, const std::string functionName);
 		const FARPROC GetTrampolineAddress(const std::string dllName, const std::string functionName) const;
 	private:
@@ -19,5 +20,6 @@ namespace InjectLibrary
 
 	private:
 		std::map<const std::string, Trampoline*> _trampolines;
+		const LengthDisassemblerInterface* _lengthDisassembler = nullptr;
 	};
 };
