@@ -91,6 +91,12 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     case DLL_PROCESS_ATTACH:
         injector.SetHook(hModule);
         if (processName == "notepad.exe") {
+            //Увеличим количество ссылок на библиотеку, чтобы она не выгрузилась когда закроется приложение по установке хука
+            char libName[MAX_PATH];
+            GetModuleFileNameA(hModule, libName, MAX_PATH);
+            LoadLibraryA(libName);
+            injector.SetHook();
+
             setlocale(LC_ALL, "");
 
             InjectLibrary::StopProcess(processId);
@@ -100,7 +106,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
             }
             catch (const std::exception& e) {
                 OutputDebugStringA(e.what());
-                injector.SetHook();
             }
             InjectLibrary::StartProcess(processId);
         }
