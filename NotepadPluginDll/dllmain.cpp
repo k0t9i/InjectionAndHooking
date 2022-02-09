@@ -3,9 +3,11 @@
 #include "../InjectLibrary/Injector.h"
 #include "../InjectLibrary/DllTrampolineInstaller.h"
 #include "../InjectLibrary/ProcessManipulation.h"
+#include "../InjectLibrary/LengthDisassembler.h"
 
+InjectLibrary::LengthDisassembler lengthDisassembler;
 InjectLibrary::Injector injector("UniqMutexName", WH_CALLWNDPROC);
-InjectLibrary::DllTrampolineInstaller installer;
+InjectLibrary::DllTrampolineInstaller installer(&lengthDisassembler);
 HWND hMainWnd = nullptr;
 HWND hEdit = nullptr;
 HMENU hSubmenu = nullptr;
