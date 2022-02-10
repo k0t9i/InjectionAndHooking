@@ -12,11 +12,18 @@ HWND hMainWnd = nullptr;
 HWND hEdit = nullptr;
 HMENU hSubmenu = nullptr;
 const UINT_PTR START_MENU_ID = 999;
+HMODULE hDll = nullptr;
 
 typedef HWND(__stdcall* CreateWindowExType)(DWORD, LPCWSTR, LPCWSTR, DWORD, int, int, int, int, HWND, HMENU, HINSTANCE, LPVOID);
 CreateWindowExType createWindowExTrampoline = nullptr;
 typedef LRESULT(__stdcall* DispatchMessageType)(const MSG* lpMsg);
 DispatchMessageType dispatchMessageTrampoline = nullptr;
+
+DWORD __stdcall ExitAppThread(LPVOID lpParam)
+{
+    FreeLibraryAndExitThread(hDll, 0);
+    return 0;
+}
 
 void AddMenuItems(HWND hWnd)
 {
@@ -27,6 +34,8 @@ void AddMenuItems(HWND hWnd)
     AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID, "ВЕРХНИЙ РЕГИСТР");
     AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID + 1, "нижний регистр");
     AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID + 2, "иНВЕРТИРОВАТЬ РЕГИСТР");
+    AppendMenuA(hSubmenu, MF_SEPARATOR, 0, NULL);
+    AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID + 3, "Выгрузить плагин");
 }
 
 HWND __stdcall CreateWindowExHookPayload(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
@@ -75,6 +84,9 @@ LRESULT __stdcall DispatchMessageHookPayload(const MSG* lpMsg)
                     SendMessageW(hEdit, EM_REPLACESEL, WPARAM(1), LPARAM(text.c_str()));
                 }
             }
+            else if (menuId == START_MENU_ID + 3) {
+                CreateThread(NULL, 0, ExitAppThread, NULL, 0, 0);
+            }
             break;
         }
     }
@@ -93,6 +105,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     case DLL_PROCESS_ATTACH:
         injector.SetHook(hModule);
         if (processName == "notepad.exe") {
+            hDll = hModule;
+
             //Увеличим количество ссылок на библиотеку, чтобы она не выгрузилась когда закроется приложение по установке хука
             char libName[MAX_PATH];
             GetModuleFileNameA(hModule, libName, MAX_PATH);
