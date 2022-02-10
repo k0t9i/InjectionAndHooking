@@ -28,7 +28,7 @@ DWORD __stdcall ExitAppThread(LPVOID lpParam)
 void AddMenuItems(HWND hWnd)
 {
     hSubmenu = CreateMenu();
-    HMENU hMenu = GetMenu(hMainWnd);
+    HMENU hMenu = GetMenu(hWnd);
 
     AppendMenuA(hMenu, MF_POPUP, UINT_PTR(hSubmenu), "Дополнительно");
     AppendMenuA(hSubmenu, MF_STRING, START_MENU_ID, "ВЕРХНИЙ РЕГИСТР");
