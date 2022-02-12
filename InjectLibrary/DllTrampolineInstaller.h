@@ -1,5 +1,8 @@
 #pragma once
-#include "pch.h"
+
+#include <windows.h>
+#include <string>
+#include <map>
 #include "Trampoline.h"
 #include "LengthDisassembler.h"
 

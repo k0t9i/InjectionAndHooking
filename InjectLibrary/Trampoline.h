@@ -1,5 +1,7 @@
 #pragma once
-#include "pch.h"
+
+#include <windows.h>
+#include <stdexcept>
 
 namespace InjectLibrary
 {
