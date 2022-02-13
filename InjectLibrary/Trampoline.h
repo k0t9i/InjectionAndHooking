@@ -59,7 +59,11 @@ namespace InjectLibrary
         const FARPROC Install();
         void Uninstall();
         const FARPROC GetAddress() const;
-
+        
+        Trampoline(const Trampoline&) = delete;
+        Trampoline& operator=(const Trampoline&) = delete;
+        Trampoline(const Trampoline&&) = delete;
+        Trampoline& operator=(const Trampoline&&) = delete;
     private:
         void FillLayout();
         void InstallHook() const;
