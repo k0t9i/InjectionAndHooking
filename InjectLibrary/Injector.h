@@ -8,7 +8,7 @@ namespace InjectLibrary
 	class Injector
 	{
 	public:
-		Injector(const std::string mutexName, int windowsMessage);
+		Injector(const std::string& mutexName, int windowsMessage);
 		virtual ~Injector() = default;
 		void CALLBACK SetHook(const HINSTANCE moduleHandle = nullptr);
 	private:

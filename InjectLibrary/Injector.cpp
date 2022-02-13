@@ -5,7 +5,7 @@ namespace InjectLibrary
 {
 	HHOOK Injector::_hookHandle = nullptr;
 
-	Injector::Injector(const std::string mutexName, int windowsMessage) : _mutexName(mutexName), _windowsMessage(windowsMessage)
+	Injector::Injector(const std::string& mutexName, int windowsMessage) : _mutexName(mutexName), _windowsMessage(windowsMessage)
 	{
 	}
 

@@ -16,7 +16,7 @@ namespace InjectLibrary
 		}
 	}
 
-	const FARPROC DllTrampolineInstaller::InstallTrampoline(const std::string dllName, const std::string functionName, void* hookPayloadFunctionAddress)
+	const FARPROC DllTrampolineInstaller::InstallTrampoline(const std::string& dllName, const std::string& functionName, void* hookPayloadFunctionAddress)
 	{
 		void* addr = GetHookedFunctionAddress(dllName, functionName);
 
@@ -31,7 +31,7 @@ namespace InjectLibrary
 		return _trampolines[key]->Install();
 	}
 
-	void DllTrampolineInstaller::UninstallTrampoline(const std::string dllName, const std::string functionName)
+	void DllTrampolineInstaller::UninstallTrampoline(const std::string& dllName, const std::string& functionName)
 	{
 		void* addr = GetHookedFunctionAddress(dllName, functionName);
 		const std::string key = GetKey(dllName, functionName);
@@ -44,7 +44,7 @@ namespace InjectLibrary
 		_trampolines.erase(key);
 	}
 
-	const FARPROC DllTrampolineInstaller::GetTrampolineAddress(const std::string dllName, const std::string functionName) const
+	const FARPROC DllTrampolineInstaller::GetTrampolineAddress(const std::string& dllName, const std::string& functionName) const
 	{
 		void* addr = GetHookedFunctionAddress(dllName, functionName);
 		const std::string key = GetKey(dllName, functionName);
@@ -55,12 +55,12 @@ namespace InjectLibrary
 		return _trampolines.at(key)->GetAddress();
 	}
 
-	const std::string DllTrampolineInstaller::GetKey(const std::string dllName, const std::string functionName) const
+	const std::string DllTrampolineInstaller::GetKey(const std::string& dllName, const std::string& functionName) const
 	{
 		return dllName + "::" + functionName;
 	}
 
-	void* DllTrampolineInstaller::GetHookedFunctionAddress(const std::string dllName, const std::string functionName) const
+	void* DllTrampolineInstaller::GetHookedFunctionAddress(const std::string& dllName, const std::string& functionName) const
 	{
 		HMODULE hDll = GetModuleHandleA(dllName.c_str());
 
@@ -79,7 +79,7 @@ namespace InjectLibrary
 		return result;
 	}
 
-	const bool DllTrampolineInstaller::IsTrampolineExist(const std::string key) const
+	const bool DllTrampolineInstaller::IsTrampolineExist(const std::string& key) const
 	{
 		return _trampolines.find(key) != _trampolines.end();
 	}
